@@ -1,0 +1,102 @@
+{% extends 'web/base.html' %}
+{% load static %}
+
+{% block css %}
+<style>
+    html,
+    body {
+        height: 100%;
+    }
+
+    body {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-align: center;
+        align-items: center;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+    }
+
+    .form-signin {
+        width: 100%;
+        max-width: 330px;
+        padding: 15px;
+        margin: auto;
+    }
+
+    .form-signin .checkbox {
+        font-weight: 400;
+    }
+
+    .form-signin .form-control {
+        position: relative;
+        box-sizing: border-box;
+        height: auto;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .form-signin .form-control:focus {
+        z-index: 2;
+    }
+
+    .form-signin input[type="email"] {
+        margin-bottom: -1px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .form-signin input[type="password"] {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+        }
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+<div class="container text-center">
+    <form class="form-signin" action="{% url 'web:login' %}" method="POST">
+        {% csrf_token %}
+
+        <img class="mb-4" src="{% static 'web/assets/img/logo.svg' %}" alt="" width="100" height="100">
+
+        <h1 class="h3 mb-3 font-weight-normal">Shine Analytics</h1>
+
+        <label class="sr-only" for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+        <input class="form-control" name="{{ form.username.html_name }}" type="text" placeholder="Username" required
+            autofocus>
+
+        <label class="sr-only" for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+        <input class="form-control" name="{{ form.password.html_name }}" type="password" placeholder="Password"
+            required>
+
+        <input type="hidden" name="next" value="{{ next }}">
+
+        {% if form.errors %}
+        <p class="text-muted">Your username and password didn't match.</p>
+        {% endif %}
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+
+        <p class="mt-5 mb-3 text-muted">2019 &copy; Shine Trading Pte Ltd</p>
+
+    </form>
+</div>
+{% endblock content %}
