@@ -1,25 +1,95 @@
 from django.db import models
 
 # Create your models here.
-class AccountsReceivable(models.Model):
-    docdate = models.CharField(max_length=255)
-    docref = models.CharField(max_length=255)
-    actcode = models.CharField(max_length=255)
-    cusname = models.CharField(max_length=255)
-    postcode = models.IntegerField()
-    custel = models.IntegerField()
-    actcur = models.CharField(max_length=3)
-    actcurwtax = models.DecimalField(max_digits=15, decimal_places=2)
-    homecurwtax = models.DecimalField(max_digits=15, decimal_places=2)
-    projcode = models.CharField(max_length=255)
-    location = models.IntegerField()
-    salescode = models.CharField(max_length=255)
-    salesname = models.CharField(max_length=255)
-    salestel = models.IntegerField()
+class Document(models.Model):
+    date = models.CharField(max_length=255)
+    reference = models.CharField(max_length=255, unique=True)
 
     class Meta:
-        verbose_name = 'accounts receivable'
-        verbose_name_plural = 'accounts receivables'
+        verbose_name = 'document'
+        verbose_name_plural = 'documents'
 
     def __str__(self):
-        return self.docdate, self.docref, self.actcode
+        return self.date, self.reference
+
+
+class Customer(models.Model):
+    code = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+    postal = models.IntegerField()
+    contact = models.IntegerField()
+
+    class Meta:
+        verbose_name = 'customer'
+        verbose_name_plural = 'customers'
+
+    def __str__(self):
+        return self.code, self.name
+
+
+class Currency(models.Model):
+    code = models.CharField(max_length=255, unique=True)
+    description = models.CharField(max_length=255, null=True)
+
+    class Meta:
+        verbose_name = 'currency'
+        verbose_name_plural = 'currencies'
+
+    def __str__(self):
+        return self.code, self.description
+
+
+class Project(models.Model):
+    code = models.CharField(max_length=255, unique=True)
+    description = models.CharField(max_length=255, null=True)
+
+    class Meta:
+        verbose_name = 'project'
+        verbose_name_plural = 'projects'
+
+    def __str__(self):
+        return self.code, self.description
+
+
+class Location(models.Model):
+    code = models.CharField(max_length=255, unique=True)
+    description = models.CharField(max_length=255, null=True)
+
+    class Meta:
+        verbose_name = 'location'
+        verbose_name_plural = 'locations'
+
+    def __str__(self):
+        return self.code, self.description
+
+
+class SalesPerson(models.Model):
+    code = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+    contact = models.IntegerField()
+
+    class Meta:
+        verbose_name = 'salesperson'
+        verbose_name_plural = 'salespersons'
+
+    def __str__(self):
+        return self.code, self.name
+
+
+class Transaction(models.Model):
+    document = models.ForeignKey(Document, on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    currency = models.ForeignKey(Currency, on_delete=models.SET_NULL, null=True)
+    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True)
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
+    salesperson = models.ForeignKey(SalesPerson, on_delete=models.SET_NULL, null=True)
+    transacted_amount = models.DecimalField(max_digits=15, decimal_places=2)
+    converted_amount = models.DecimalField(max_digits=15, decimal_places=2)
+
+    class Meta:
+        verbose_name = 'transaction'
+        verbose_name_plural = 'transactions'
+        unique_together = (("document", "customer", "project"),)
+
+    def __str__(self):
+        return self.document, self.customer, self.project
