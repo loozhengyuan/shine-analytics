@@ -42,53 +42,52 @@ class Command(BaseCommand):
             if len(entry) != 14:
                 raise CommandError("Size of data entry is invalid!")
             else:
-                outcome = True
+                discard = False
                 reasons = []
 
-            # Condition 1: Checks if DocDate begins from 2016 onwards
+            # Omission 1: Omits if DocDate does not begin from 2016 onwards
             if int(entry[0][0:4]) < 2016:
-                outcome = False
-                reasons.append("Condition 1: DocDate does not begin from 2016 onwards")
+                discard = True
+                reasons.append("DocDate does not begin from 2016 onwards")
 
-            # Condition 2: Checks if DocRef begins with B or I, case insensitive
+            # Omission 2: Omits if DocRef does not begin with B or I
             if entry[1][0].upper() not in ['B', 'I']:
-                outcome = False
-                reasons.append("Condition 2: DocRef does not begin with B or I")
-
-            # Condition 3: Checks if AcCur is USD or SGD
-            if entry[6].upper() not in ['USD', 'SGD']:
-                outcome = False
-                reasons.append("Condition 3: AcCur is not USD or SGD")
+                discard = True
+                reasons.append("DocRef does not begin with B or I")
             
-            # Condition 4: Checks if AcCurWTaxAmt and HomeWTaxAmt is same if transaction in SGD
-            if entry[6].upper() == 'SGD' and float(entry[7]) != float(entry[8]):
-                outcome = False
-                reasons.append("Condition 4: HomeWTaxAmt is not the same as AcCurWTaxAmt when AcCur is SGD")
+            # Omission 3: Omits if transaction in SGD but HomeWTaxAmt differs from AcCurWTaxAmt
+            if entry[6].upper() == 'SGD' and abs(float(entry[7])) != abs(float(entry[8])):
+                discard = True
+                reasons.append("Transaction in SGD but HomeWTaxAmt differs from AcCurWTaxAmt")
 
-            # Condition 5: Checks if polarity of AcCurWTaxAmt and HomeWTaxAmt is identical
-            if (float(entry[7]) < 0 and float(entry[8]) > 0) or (float(entry[7]) > 0 and float(entry[8]) < 0):
-                outcome = False
-                reasons.append("Condition 5: Polarity of AcCurWTaxAmt and HomeWTaxAmt is different")
+            # Omission 4: Omits if transaction in USD but AcCurWTaxAmt is more than or equals to HomeWTaxAmt
+            if entry[6].upper() == 'USD' and abs(float(entry[7])) >= abs(float(entry[8])):
+                discard = True
+                reasons.append("Transaction in USD but AcCurWTaxAmt is more than or equals to HomeWTaxAmt")
 
-            # Condition 6: Checks if AcCurWTaxAmt and HomeWTaxAmt is 0 when either of them are
-            if (float(entry[7]) == 0 and float(entry[8]) != 0) or (float(entry[7]) != 0 and float(entry[8]) == 0):
-                outcome = False
-                reasons.append("Condition 6: AcCurWTaxAmt and HomeWTaxAmt should be 0 if either are")
+            # Omission 5: Omits if either AcCurWTaxAmt or HomeWTaxAmt is 0
+            if float(entry[7]) == 0 or float(entry[8]) == 0:
+                discard = True
+                reasons.append("Either AcCurWTaxAmt or HomeWTaxAmt is 0")
 
-            # Condition 7: Checks if Location is within 1, 2, 3, 4, 5
-            if int(entry[10]) not in [1, 2, 3, 4, 5]:
-                outcome = False
-                reasons.append("Condition 7: Location code not within range of 1-5")
+            # Apply corrections and export if not omitted
+            if not discard:
+                # Correction 1: Apply abs() to all amounts
+                entry[7] = abs(float(entry[7]))
+                entry[8] = abs(float(entry[8]))
 
-            # Appends to sanitised list if passes check
-            if outcome:
+                # Correction 2: Apply -1 to B-prefix documents
+                if entry[1][0].upper() == 'B':
+                    entry[7] *= -1
+                    entry[8] *= -1
+
                 # Appends entry to sanitised list
                 sanitised.append(entry)
 
             # Appends to omitted list if fails check
             else:
                 # Appends reasons
-                entry.append("\n".join(reasons))
+                entry.append(", ".join(reasons))
                 # Appends entry to omitted list
                 omitted.append(entry)
 
