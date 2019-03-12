@@ -1,0 +1,140 @@
+{% extends 'web/bulma.html' %}
+{% load static %}
+
+{% block css %}
+<link href="https://cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.css" rel="stylesheet" type="text/css">
+<link href="https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.css" rel="stylesheet" type="text/css">
+<link href="https://cdn.pydata.org/bokeh/release/bokeh-tables-1.0.4.min.css" rel="stylesheet" type="text/css">
+{% endblock css %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Get all "navbar-burger" elements
+        const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+        // Check if there are any navbar burgers
+        if ($navbarBurgers.length > 0) {
+
+            // Add a click event on each of them
+            $navbarBurgers.forEach(el => {
+                el.addEventListener('click', () => {
+
+                    // Get the target from the "data-target" attribute
+                    const target = el.dataset.target;
+                    const $target = document.getElementById(target);
+
+                    // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                    el.classList.toggle('is-active');
+                    $target.classList.toggle('is-active');
+
+                });
+            });
+        }
+
+    });
+</script>
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.js"></script>
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.js"></script>
+<script src="https://cdn.pydata.org/bokeh/release/bokeh-tables-1.0.4.min.js"></script>
+{{ bokehjs|safe }}
+{% endblock js %}
+
+{% block header %}
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="{% url 'web:index' %}">
+                <img src="{% static 'web/assets/img/logo.svg' %}" width="30" height="30">
+            </a>
+
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false"
+                data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item">
+                    Home
+                </a>
+
+                <a class="navbar-item">
+                    Documentation
+                </a>
+
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        More
+                    </a>
+
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item">
+                            About
+                        </a>
+                        <a class="navbar-item">
+                            Jobs
+                        </a>
+                        <a class="navbar-item">
+                            Contact
+                        </a>
+                        <hr class="navbar-divider">
+                        <a class="navbar-item">
+                            Report an issue
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-danger" href="{% url 'web:logout' %}">
+                            <strong>Sign out</strong>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</nav>
+{% endblock header %}
+
+{% block content %}
+<section class="section has-background-light">
+    <div class="container">
+        <h1 class="title">
+            Analytics Dashboard
+        </h1>
+        <p class="subtitle">
+            Welcome back <strong>{{ user }}</strong>!
+        </p>
+        <div class="columns">
+            {% for title, plot in bokehdiv.items %}
+            <div class="column">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            {{ title }}
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            {{ plot|safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block footer %}
+{% endblock footer %}
