@@ -3,7 +3,7 @@ import csv
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 from django.utils.dateparse import parse_date
-from ...models import AccountsReceivable
+from ...models import Document, Customer, Currency, Project, Location, SalesPerson, Transaction
 
 class Command(BaseCommand):
     help = 'loads analytics data into database'
@@ -39,27 +39,54 @@ class Command(BaseCommand):
             if len(entry) != 14:
                 raise CommandError("Size of data entry is invalid!")
             else:
-                # Create AccountsReceivable object
                 try:
-                    a = AccountsReceivable(
-                            docdate = parse_date("{}-{}-{}".format(entry[0][0:4], entry[0][4:6], entry[0][6:8])),
-                            docref = entry[1],
-                            actcode = entry[2],
-                            cusname = entry[3],
-                            postcode = entry[4],
-                            custel = entry[5],
-                            actcur = entry[6],
-                            actcurwtax = entry[7],
-                            homecurwtax = entry[8],
-                            projcode = entry[9],
-                            location = entry[10],
-                            salescode = entry[11],
-                            salesname = entry[12],
-                            salestel = entry[13],
-                        )
-                    
-                    # Save and commit entry
-                    a.save()
+                    # Get or create Document object
+                    document, created = Document.objects.get_or_create(
+                        date = parse_date("{}-{}-{}".format(entry[0][0:4], entry[0][4:6], entry[0][6:8])),
+                        reference = entry[1],
+                    )
+
+                    # Get or create Customer object
+                    customer, created = Customer.objects.get_or_create(
+                        code = entry[2],
+                        name = entry[3],
+                        postal = entry[4],
+                        contact = entry[5],
+                    )
+
+                    # Get or create Currency object
+                    currency, created = Currency.objects.get_or_create(
+                        code = entry[6],
+                    )
+
+                    # Get or create Project object
+                    project, created = Project.objects.get_or_create(
+                        code = entry[9],
+                    )
+
+                    # Get or create Location object
+                    location, created = Location.objects.get_or_create(
+                        code = entry[10],
+                    )
+
+                    # Get or create SalesPerson object
+                    salesperson, created = SalesPerson.objects.get_or_create(
+                        code = entry[11],
+                        name = entry[12],
+                        contact = entry[13],
+                    )
+
+                    # Create Transaction object
+                    transaction = Transaction.objects.create(
+                        document = document,
+                        customer = customer,
+                        currency = currency,
+                        project = project,
+                        location = location,
+                        salesperson = salesperson,
+                        transacted_amount = entry[7],
+                        converted_amount = entry[8],
+                    )
 
                     # Increment counter
                     imported += 1
@@ -67,7 +94,6 @@ class Command(BaseCommand):
                 except IntegrityError:
                     # Handle output for violating UNIQUE constraint
                     self.stdout.write(self.style.NOTICE("Document already exists: {}".format(entry)))
-                
                 except:
                     # Handle output for unknown errors
                     self.stdout.write(self.style.NOTICE("An unknown error has occured: {}".format(entry)))
