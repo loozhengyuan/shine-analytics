@@ -114,8 +114,9 @@
         <p class="subtitle">
             Welcome back <strong>{{ user }}</strong>!
         </p>
+        {% for row in bokehdiv %}
         <div class="columns">
-            {% for title, plot in bokehdiv.items %}
+            {% for title, plot in row.items %}
             <div class="column">
                 <div class="card">
                     <header class="card-header">
@@ -132,6 +133,7 @@
             </div>
             {% endfor %}
         </div>
+        {% endfor %}
     </div>
 </section>
 {% endblock content %}
