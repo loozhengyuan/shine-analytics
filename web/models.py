@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class Document(models.Model):
-    date = models.CharField(max_length=255)
+    date = models.DateField(max_length=255)
     reference = models.CharField(max_length=255, unique=True)
 
     class Meta:
