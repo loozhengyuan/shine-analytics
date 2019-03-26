@@ -1,3 +1,4 @@
+import inspect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from bokeh.embed import components
@@ -9,11 +10,17 @@ def index(request):
 
     # Define plots
     plots = {
-        'plot1': top_ten_customer_revenue_contribution_of_all_time(),
-        'plot2': top_ten_customer_revenue_contribution_last_twelve_months(),
-        'plot3': accounts_receivables_balance_by_month(),
-        'plot4': total_income_by_month(),
-        'plot5': total_projects_by_quarter(),
+        'plot1': net_accounts_receivables_balance_by_month(),
+        'plot2': cumulative_net_accounts_receivables_balance_by_month(),
+        'plot3': top_ten_customer_revenue_contribution_last_twelve_months(),
+        'plot4': top_ten_customer_revenue_contribution_of_all_time(),
+        'plot5': total_income_by_month(),
+        'plot6': total_projects_by_quarter(),
+        'plot7': top_ten_accounts_receivables_balance_by_customer(),
+        'plot8': bottom_ten_accounts_receivables_balance_by_customer(),
+        'plot9': revenue_by_salesperson_per_year(),
+        'plot10': income_by_location(),
+        'plot11': income_by_project_per_year(),
     }
 
     # Create components
@@ -22,15 +29,28 @@ def index(request):
     # Create containers and headers
     divlist = [
         {
-            "Top 10 Customer Revenue Contribution of All Time": div['plot1'],
-            "Top 10 Customer Revenue Contribution in the Last 12 Months": div['plot2'],
+            "plot1": div['plot1'],
+            "plot2": div['plot2'],
         },
         {
-            "Accounts Receivales Balance by Month": div['plot3'],
-            "Total Projects by Quarter": div['plot5'],
+            "plot3": div['plot3'],
+            "plot4": div['plot4'],
         },
         {
-            "Total Income by Month": div['plot4'],
+            "plot5": div['plot5'],
+            "plot6": div['plot6'],
+        },
+        {
+            "plot7": div['plot7'],
+            "plot8": div['plot8'],
+        },
+        {
+            "plot9": div['plot9'],
+            "plot10": div['plot10'],
+        },
+        {
+            "plot11": div['plot11'],
+            "asdas": "",
         },
     ]
 
