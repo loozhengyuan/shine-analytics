@@ -116,14 +116,14 @@
         </p>
         {% for row in bokehdiv %}
         <div class="columns">
-            {% for title, plot in row.items %}
+            {% for _, plot in row.items %}
             <div class="column">
                 <div class="card">
-                    <header class="card-header">
+                    <!-- <header class="card-header">
                         <p class="card-header-title">
                             {{ title }}
                         </p>
-                    </header>
+                    </header> -->
                     <div class="card-content">
                         <div class="content">
                             {{ plot|safe }}
