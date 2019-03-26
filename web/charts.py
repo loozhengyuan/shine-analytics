@@ -272,8 +272,8 @@ def revenue_by_salesperson_per_year():
 
     return p
 
-def net_accounts_receivables_balance_by_month():
-    """Returns plot for the net accounts receivables balance by month"""
+def accounts_receivables_ratio_by_month():
+    """Returns plot for the cumulative net accounts receivables balance by month"""
 
     # Queryset
     query = (
@@ -288,18 +288,26 @@ def net_accounts_receivables_balance_by_month():
 
     # Creating lists from Queryset
     month = [i['month'].strftime("%b '%y") for i in query]
+    inflow = [i['inflow'] for i in query]
     variance = [i['variance'] for i in query]
+    cumvar = [i for i in itertools.accumulate(variance)]
+    varratio = [v/i for v, i in zip(variance, inflow)]
+    cumvarratio = [c/i for c, i in zip(cumvar, inflow)]
+
 
     # Create ColumnDataSource
     data = dict(
         month=month,
         variance=variance,
+        cumvar=cumvar,
+        varratio=varratio,
+        cumvarratio=cumvarratio,
     )
     source = ColumnDataSource(data=data)
 
     # Create plot
     p = figure(
-        title="Accounts Receivables Balance by Month",
+        title="Accounts Receivables Ratio by Month",
         x_range=month,
         tools=tools,
         x_axis_label='month/year',
@@ -307,18 +315,24 @@ def net_accounts_receivables_balance_by_month():
         tooltips=[
             ("Month", "@month"),
             ("Variance", "@variance{$0,0.00}"),
+            ("Cumulative Variance", "@cumvar{$0,0.00}"),
+            ("AR Ratio", "@varratio{0.000}"),
+            ("Cum. AR Ratio", "@cumvarratio{0.000}"),
         ],
         height=320,
     )
-    p.vbar(x='month', top='variance', width=0.9, source=source)
+    p.line(x='month', y='varratio', source=source, legend="discrete", line_width=2, line_color="indigo")
+    p.circle(x='month', y='varratio', source=source, legend="discrete", fill_color=None, line_color="indigo")
+    p.line(x='month', y='cumvarratio', source=source, legend="cumulative", line_width=2, line_color="tomato")
+    p.circle(x='month', y='cumvarratio', source=source, legend="cumulative", fill_color=None, line_color="tomato")
     p.xgrid.grid_line_color = None
     p.sizing_mode = 'scale_width'
-    p.yaxis.formatter = NumeralTickFormatter(format='$0a')
+    p.legend.location = "top_left"
     p.xaxis.major_label_orientation = math.pi/3
 
     return p
 
-def cumulative_net_accounts_receivables_balance_by_month():
+def accounts_receivables_balance_by_month():
     """Returns plot for the cumulative net accounts receivables balance by month"""
 
     # Queryset
@@ -347,7 +361,7 @@ def cumulative_net_accounts_receivables_balance_by_month():
 
     # Create plot
     p = figure(
-        title="Cumulative Net Accounts Receivables Balance by Month",
+        title="Accounts Receivables Balance by Month",
         x_range=month,
         tools=tools,
         x_axis_label='month/year',
@@ -359,9 +373,13 @@ def cumulative_net_accounts_receivables_balance_by_month():
         ],
         height=320,
     )
-    p.vbar(x='month', top='cumvar', width=0.9, source=source)
+    p.line(x='month', y='variance', source=source, legend="discrete", line_width=2, line_color="indigo")
+    p.circle(x='month', y='variance', source=source, legend="discrete", fill_color=None, line_color="indigo")
+    p.line(x='month', y='cumvar', source=source, legend="cumulative", line_width=2, line_color="tomato")
+    p.circle(x='month', y='cumvar', source=source, legend="cumulative", fill_color=None, line_color="tomato")
     p.xgrid.grid_line_color = None
     p.sizing_mode = 'scale_width'
+    p.legend.location = "top_left"
     p.yaxis.formatter = NumeralTickFormatter(format='$0a')
     p.xaxis.major_label_orientation = math.pi/3
 

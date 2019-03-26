@@ -10,8 +10,8 @@ def index(request):
 
     # Define plots
     plots = {
-        'plot1': net_accounts_receivables_balance_by_month(),
-        'plot2': cumulative_net_accounts_receivables_balance_by_month(),
+        'plot1': accounts_receivables_balance_by_month(),
+        'plot2': accounts_receivables_ratio_by_month(),
         'plot3': top_ten_customer_revenue_contribution_last_twelve_months(),
         'plot4': top_ten_customer_revenue_contribution_of_all_time(),
         'plot5': total_income_by_month(),
