@@ -1,8 +1,9 @@
+import math
 from dateutil.relativedelta import relativedelta
 from bokeh.plotting import figure
 from bokeh.core.properties import value
 from bokeh.io import show, output_file
-from bokeh.models import ColumnDataSource
+from bokeh.models import ColumnDataSource, NumeralTickFormatter
 from bokeh.palettes import Spectral10
 from bokeh.transform import dodge, factor_cmap
 from django.db.models.functions import TruncMonth, TruncQuarter
@@ -47,12 +48,14 @@ def accounts_receivables_balance_by_month():
         y_axis_label='net accounts receivables',
         tooltips=[
             ("Month", "@month"),
-            ("Variance", "$@variance"),
-        ]
+            ("Variance", "@variance{$0,0.00}"),
+        ],
+        height=320,
     )
     p.vbar(x='month', top='variance', width=0.9, source=source)
     p.xgrid.grid_line_color = None
     p.sizing_mode = 'scale_width'
+    p.yaxis.formatter = NumeralTickFormatter(format='$0a')
 
     return p
 
@@ -83,13 +86,15 @@ def top_ten_customer_revenue_contribution_of_all_time():
         y_axis_label='total revenue',
         tooltips=[
             ("Customer Name", "@customer"),
-            ("Total Revenue", "@revenue"),
-        ]
+            ("Total Revenue", "@revenue{$0,0.00}"),
+        ],
+        height=320,
     )
     p.vbar(x='customer', top='revenue', width=0.9, source=source, line_color='white', fill_color=factor_cmap('customer', palette=Spectral10, factors=customer))
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
     p.sizing_mode = 'scale_width'
+    p.yaxis.formatter = NumeralTickFormatter(format='$0a')
 
     return p
 
@@ -121,13 +126,15 @@ def top_ten_customer_revenue_contribution_last_twelve_months():
         y_axis_label='total revenue',
         tooltips=[
             ("Customer Name", "@customer"),
-            ("Total Revenue", "@revenue"),
-        ]
+            ("Total Revenue", "@revenue{$0,0.00}"),
+        ],
+        height=320,
     )
     p.vbar(x='customer', top='revenue', width=0.9, source=source, line_color='white', fill_color=factor_cmap('customer', palette=Spectral10, factors=customer))
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
     p.sizing_mode = 'scale_width'
+    p.yaxis.formatter = NumeralTickFormatter(format='$0a')
 
     return p
 
@@ -159,12 +166,14 @@ def total_projects_by_quarter():
         tooltips=[
             ("Quarter", "@quarter"),
             ("Projects", "@total"),
-        ]
+        ],
+        height=320,
     )
     p.vbar(x='quarter', top='total', width=0.9, source=source)
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
     p.sizing_mode = 'scale_width'
+    p.xaxis.major_label_orientation = math.pi/3
 
     return p
 
@@ -196,12 +205,15 @@ def total_income_by_month():
         y_axis_label='income ($)',
         tooltips=[
             ("Month", "@month"),
-            ("Total Income", "$@total"),
-        ]
+            ("Total Income", "@total{$0,0.00}"),
+        ],
+        height=150,
     )
     p.vbar(x='month', top='total', width=0.9, source=source)
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
     p.sizing_mode = 'scale_width'
+    p.yaxis.formatter = NumeralTickFormatter(format='$0a')
+    p.xaxis.major_label_orientation = math.pi/3
 
     return p
