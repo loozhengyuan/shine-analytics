@@ -30,6 +30,7 @@ def top_ten_accounts_receivables_balance_by_customer():
 
     # Creating lists from Queryset
     customers = [i['customer__name'] for i in query]
+    custshort = ["".join([word[:1] for word in customer.split(' ')]) for customer in customers]
     transactions = [i['transactions'] for i in query]
     inflow = [i['inflow'] for i in query]
     outflow = [i['outflow'] for i in query]
@@ -38,6 +39,7 @@ def top_ten_accounts_receivables_balance_by_customer():
     # Create ColumnDataSource
     data = dict(
         customers=customers,
+        custshort=custshort,
         variance=variance,
         inflow=inflow,
         outflow=outflow,
@@ -47,7 +49,7 @@ def top_ten_accounts_receivables_balance_by_customer():
     # Create plot
     p = figure(
         title="Top 10 AR Balance by Customer",
-        x_range=customers,
+        x_range=custshort,
         tools=tools,
         x_axis_label='customers',
         y_axis_label='net accounts receivables',
@@ -59,7 +61,7 @@ def top_ten_accounts_receivables_balance_by_customer():
         ],
         height=320,
     )
-    p.vbar(x='customers', top='variance', width=0.9, source=source, fill_color=factor_cmap('customers', palette=all_palettes['Viridis'][10], factors=customers))
+    p.vbar(x='custshort', top='variance', width=0.9, source=source, fill_color='green', fill_alpha=0.3, line_color='white')
     p.xgrid.grid_line_color = None
     p.sizing_mode = 'scale_width'
     p.yaxis.formatter = NumeralTickFormatter(format='$0a')
@@ -81,6 +83,7 @@ def bottom_ten_accounts_receivables_balance_by_customer():
 
     # Creating lists from Queryset
     customers = [i['customer__name'] for i in query]
+    custshort = ["".join([word[:1] for word in customer.split(' ')]) for customer in customers]
     transactions = [i['transactions'] for i in query]
     inflow = [i['inflow'] for i in query]
     outflow = [i['outflow'] for i in query]
@@ -89,6 +92,7 @@ def bottom_ten_accounts_receivables_balance_by_customer():
     # Create ColumnDataSource
     data = dict(
         customers=customers,
+        custshort=custshort,
         variance=variance,
         inflow=inflow,
         outflow=outflow,
@@ -98,7 +102,7 @@ def bottom_ten_accounts_receivables_balance_by_customer():
     # Create plot
     p = figure(
         title="Bottom 10 AR Balance by Customer",
-        x_range=customers,
+        x_range=custshort,
         tools=tools,
         x_axis_label='customers',
         y_axis_label='net accounts receivables',
@@ -110,7 +114,7 @@ def bottom_ten_accounts_receivables_balance_by_customer():
         ],
         height=320,
     )
-    p.vbar(x='customers', top='variance', width=0.9, source=source, fill_color=factor_cmap('customers', palette=all_palettes['Viridis'][10], factors=customers))
+    p.vbar(x='custshort', top='variance', width=0.9, source=source, fill_color='red', fill_alpha=0.3, line_color='white')
     p.xgrid.grid_line_color = None
     p.sizing_mode = 'scale_width'
     p.yaxis.formatter = NumeralTickFormatter(format='$0a')
@@ -399,12 +403,14 @@ def top_ten_customer_revenue_contribution_of_all_time():
     )
 
     # Creating lists from Queryset
-    customer = [i['customer__name'] for i in query]
+    customers = [i['customer__name'] for i in query]
+    custshort = ["".join([word[:1] for word in customer.split(' ')]) for customer in customers]
     revenue = [round(i['total'], 2) for i in query]
 
     # Create ColumnDataSource
     data = dict(
-        customer=customer,
+        customers=customers,
+        custshort=custshort,
         revenue=revenue,
     )
     source = ColumnDataSource(data=data)
@@ -412,17 +418,17 @@ def top_ten_customer_revenue_contribution_of_all_time():
     # Create plot
     p = figure(
         title="Top 10 Customer Revenue Contribution of All-Time",
-        x_range=customer,
+        x_range=custshort,
         tools=tools,
         x_axis_label='customer',
         y_axis_label='total revenue',
         tooltips=[
-            ("Customer Name", "@customer"),
+            ("Customer Name", "@customers"),
             ("Total Revenue", "@revenue{$0,0.00}"),
         ],
         height=320,
     )
-    p.vbar(x='customer', top='revenue', width=0.9, source=source, line_color='white', fill_color=factor_cmap('customer', palette=all_palettes['Spectral'][10], factors=customer))
+    p.vbar(x='custshort', top='revenue', width=0.9, source=source, line_color='white', fill_color=factor_cmap('customers', palette=all_palettes['Spectral'][10], factors=customers))
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
     p.sizing_mode = 'scale_width'
@@ -445,12 +451,14 @@ def top_ten_customer_revenue_contribution_last_twelve_months():
     )
 
     # Creating lists from Queryset
-    customer = [i['customer__name'] for i in query]
+    customers = [i['customer__name'] for i in query]
+    custshort = ["".join([word[:1] for word in customer.split(' ')]) for customer in customers]
     revenue = [round(i['total'], 2) for i in query]
     
     # Create ColumnDataSource
     data = dict(
-        customer=customer,
+        customers=customers,
+        custshort=custshort,
         revenue=revenue,
     )
     source = ColumnDataSource(data=data)
@@ -458,17 +466,17 @@ def top_ten_customer_revenue_contribution_last_twelve_months():
     # Create plot
     p = figure(
         title="Top 10 Customer Revenue Contribution In The Last 12 Months",
-        x_range=customer,
+        x_range=custshort,
         tools=tools,
         x_axis_label='customer',
         y_axis_label='total revenue',
         tooltips=[
-            ("Customer Name", "@customer"),
+            ("Customer Name", "@customers"),
             ("Total Revenue", "@revenue{$0,0.00}"),
         ],
         height=320,
     )
-    p.vbar(x='customer', top='revenue', width=0.9, source=source, line_color='white', fill_color=factor_cmap('customer', palette=all_palettes['Spectral'][10], factors=customer))
+    p.vbar(x='custshort', top='revenue', width=0.9, source=source, line_color='white', fill_color=factor_cmap('customers', palette=all_palettes['Spectral'][10], factors=customers))
     p.xgrid.grid_line_color = None
     p.y_range.start = 0
     p.sizing_mode = 'scale_width'
