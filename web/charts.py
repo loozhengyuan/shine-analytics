@@ -132,7 +132,7 @@ def income_by_location():
         .annotate(year=TruncYear('document__date'))
         .values('year', 'location__code')
         .annotate(total=Sum('converted_amount'))
-        .order_by()
+        .order_by('-year')
     )
 
     # Creating lists from Queryset
@@ -233,7 +233,7 @@ def revenue_by_salesperson_per_year():
         .annotate(year=TruncYear('document__date'))
         .values('year', 'salesperson__name')
         .annotate(total=Sum('converted_amount'))
-        .order_by()
+        .order_by('-year')
     )
 
     # Creating lists from Queryset
