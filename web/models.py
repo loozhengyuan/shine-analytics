@@ -10,7 +10,7 @@ class Document(models.Model):
         verbose_name_plural = 'documents'
 
     def __str__(self):
-        return ("{self.date} {self.reference}").format(self=self)
+        return "{self.date} {self.reference}".format(self=self)
 
 
 class Customer(models.Model):
@@ -24,7 +24,7 @@ class Customer(models.Model):
         verbose_name_plural = 'customers'
 
     def __str__(self):
-        return ("{self.code} {self.name}").format(self=self)
+        return "{self.code} {self.name}".format(self=self)
 
 
 class Currency(models.Model):
@@ -36,7 +36,7 @@ class Currency(models.Model):
         verbose_name_plural = 'currencies'
 
     def __str__(self):
-        return ("{self.code} {self.description}").format(self=self)
+        return "{self.code} {self.description}".format(self=self)
 
 
 class Project(models.Model):
@@ -48,7 +48,7 @@ class Project(models.Model):
         verbose_name_plural = 'projects'
 
     def __str__(self):
-        return ("{self.code} {self.description}").format(self=self)
+        return "{self.code} {self.description}".format(self=self)
 
 
 class Location(models.Model):
@@ -60,7 +60,7 @@ class Location(models.Model):
         verbose_name_plural = 'locations'
 
     def __str__(self):
-        return ("{self.code} {self.description}").format(self=self)
+        return "{self.code} {self.description}".format(self=self)
 
 
 class SalesPerson(models.Model):
@@ -73,7 +73,7 @@ class SalesPerson(models.Model):
         verbose_name_plural = 'salespersons'
 
     def __str__(self):
-        return ("{self.code} {self.name}").format(self=self)
+        return "{self.code} {self.name}".format(self=self)
 
 
 class Transaction(models.Model):
@@ -92,4 +92,4 @@ class Transaction(models.Model):
         unique_together = (("document", "customer", "project"),)
 
     def __str__(self):
-        return ("{self.document} {self.customer} {self.project}").format(self=self)
+        return "{self.document} {self.customer} {self.project}".format(self=self)
