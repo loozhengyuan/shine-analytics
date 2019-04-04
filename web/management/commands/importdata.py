@@ -3,7 +3,7 @@ import csv
 from django.core.management.base import BaseCommand, CommandError
 from django.db.utils import IntegrityError
 from django.utils.dateparse import parse_date
-from web.models import Document, Customer, Currency, Project, Location, SalesPerson, Transaction
+from web.models import *
 
 class Command(BaseCommand):
     help = 'loads analytics data into database'
@@ -40,18 +40,9 @@ class Command(BaseCommand):
                 raise CommandError("Size of data entry is invalid!")
             else:
                 try:
-                    # Get or create Document object
-                    document, created = Document.objects.get_or_create(
-                        date=parse_date("{}-{}-{}".format(entry[0][0:4], entry[0][4:6], entry[0][6:8])),
-                        reference=entry[1],
-                    )
-
                     # Get or create Customer object
                     customer, created = Customer.objects.get_or_create(
-                        code=entry[2],
                         name=entry[3],
-                        postal=entry[4],
-                        contact=entry[5],
                     )
 
                     # Get or create Currency object
@@ -59,14 +50,13 @@ class Command(BaseCommand):
                         code=entry[6],
                     )
 
-                    # Get or create Project object
-                    project, created = Project.objects.get_or_create(
-                        code=entry[9],
-                    )
-
-                    # Get or create Location object
-                    location, created = Location.objects.get_or_create(
-                        code=entry[10],
+                    # Get or create CustomerAccount object
+                    custaccount, created = CustomerAccount.objects.get_or_create(
+                        code=entry[2],
+                        postal=entry[4],
+                        contact=entry[5],
+                        customer=customer,
+                        currency=currency,
                     )
 
                     # Get or create SalesPerson object
@@ -75,15 +65,30 @@ class Command(BaseCommand):
                         name=entry[12],
                         contact=entry[13],
                     )
+                    
+                    # Get or create Project object
+                    project, created = Project.objects.get_or_create(
+                        code=entry[9],
+                        custaccount=custaccount,
+                        salesperson=salesperson,
+                    )
+
+                    # Get or create Document object
+                    document, created = Document.objects.get_or_create(
+                        date=parse_date("{}-{}-{}".format(entry[0][0:4], entry[0][4:6], entry[0][6:8])),
+                        reference=entry[1],
+                    )
+
+                    # Get or create Location object
+                    location, created = Location.objects.get_or_create(
+                        code=entry[10],
+                    )
 
                     # Create Transaction object
                     transaction = Transaction.objects.create(
                         document=document,
-                        customer=customer,
-                        currency=currency,
                         project=project,
                         location=location,
-                        salesperson=salesperson,
                         transacted_amount=entry[7],
                         converted_amount=entry[8],
                     )

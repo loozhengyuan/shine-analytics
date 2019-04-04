@@ -22,14 +22,14 @@ def top_ten_accounts_receivables_balance_by_customer():
     query = (
         Transaction
         .objects
-        .values('customer__name')
+        .values('project__custaccount__customer__name')
         .annotate(inflow=Sum('converted_amount', filter=Q(document__reference__startswith='I')), outflow=Sum('converted_amount', filter=Q(document__reference__startswith='B')), variance=F('inflow')+F('outflow'), transactions=Count('converted_amount', filter=Q(document__reference__startswith='I')))
         .exclude(variance__isnull=True)
         .order_by('-variance')[:10]
     )
 
     # Creating lists from Queryset
-    customers = [i['customer__name'] for i in query]
+    customers = [i['project__custaccount__customer__name'] for i in query]
     custshort = ["".join([word[:1] for word in customer.split(' ')]) for customer in customers]
     transactions = [i['transactions'] for i in query]
     inflow = [i['inflow'] for i in query]
@@ -75,14 +75,14 @@ def bottom_ten_accounts_receivables_balance_by_customer():
     query = (
         Transaction
         .objects
-        .values('customer__name')
+        .values('project__custaccount__customer__name')
         .annotate(inflow=Sum('converted_amount', filter=Q(document__reference__startswith='I')), outflow=Sum('converted_amount', filter=Q(document__reference__startswith='B')), variance=F('inflow')+F('outflow'), transactions=Count('converted_amount', filter=Q(document__reference__startswith='I')))
         .exclude(variance__isnull=True)
         .order_by('variance')[:10]
     )
 
     # Creating lists from Queryset
-    customers = [i['customer__name'] for i in query]
+    customers = [i['project__custaccount__customer__name'] for i in query]
     custshort = ["".join([word[:1] for word in customer.split(' ')]) for customer in customers]
     transactions = [i['transactions'] for i in query]
     inflow = [i['inflow'] for i in query]
@@ -231,13 +231,13 @@ def revenue_by_salesperson_per_year():
         .objects
         .filter(document__reference__startswith='I')
         .annotate(year=TruncYear('document__date'))
-        .values('year', 'salesperson__name')
+        .values('year', 'project__salesperson__name')
         .annotate(total=Sum('converted_amount'))
         .order_by('-year')
     )
 
     # Creating lists from Queryset
-    salespersons = list(collections.OrderedDict.fromkeys([i['salesperson__name'] for i in query]))
+    salespersons = list(collections.OrderedDict.fromkeys([i['project__salesperson__name'] for i in query]))
     years = list(collections.OrderedDict.fromkeys([i['year'].strftime("%Y") for i in query]))
     revenue = {year: [i['total'] for i in query if i['year'].strftime("%Y") == year] for year in years}
 
@@ -397,13 +397,13 @@ def top_ten_customer_revenue_contribution_of_all_time():
         Transaction
         .objects
         .filter(document__reference__startswith='I')
-        .values('customer__name')
+        .values('project__custaccount__customer__name')
         .annotate(total=Sum('converted_amount'))
         .order_by('-total')[:10]
     )
 
     # Creating lists from Queryset
-    customers = [i['customer__name'] for i in query]
+    customers = [i['project__custaccount__customer__name'] for i in query]
     custshort = ["".join([word[:1] for word in customer.split(' ')]) for customer in customers]
     revenue = [round(i['total'], 2) for i in query]
 
@@ -445,13 +445,13 @@ def top_ten_customer_revenue_contribution_last_twelve_months():
         Transaction
         .objects
         .filter(document__reference__startswith='I', document__date__range=(latest.document.date - relativedelta(years=1), latest.document.date))
-        .values('customer__name')
+        .values('project__custaccount__customer__name')
         .annotate(total=Sum('converted_amount'))
         .order_by('-total')[:10]
     )
 
     # Creating lists from Queryset
-    customers = [i['customer__name'] for i in query]
+    customers = [i['project__custaccount__customer__name'] for i in query]
     custshort = ["".join([word[:1] for word in customer.split(' ')]) for customer in customers]
     revenue = [round(i['total'], 2) for i in query]
     
