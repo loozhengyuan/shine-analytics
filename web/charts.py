@@ -276,8 +276,8 @@ def revenue_by_salesperson_per_year():
 
     return p
 
-def accounts_receivables_ratio_by_month():
-    """Returns plot for the cumulative net accounts receivables balance by month"""
+def accounts_receivables_turnover_by_month():
+    """Returns plot for the cumulative net accounts receivables turnover by month"""
 
     # Queryset
     query = (
@@ -295,43 +295,37 @@ def accounts_receivables_ratio_by_month():
     inflow = [i['inflow'] for i in query]
     variance = [i['variance'] for i in query]
     cumvar = [i for i in itertools.accumulate(variance)]
-    varratio = [v/i for v, i in zip(variance, inflow)]
-    cumvarratio = [c/i for c, i in zip(cumvar, inflow)]
-
+    turnover = [i/c for c, i in zip(cumvar, inflow)]
 
     # Create ColumnDataSource
     data = dict(
         month=month,
+        inflow=inflow,
         variance=variance,
         cumvar=cumvar,
-        varratio=varratio,
-        cumvarratio=cumvarratio,
+        turnover=turnover,
     )
     source = ColumnDataSource(data=data)
 
     # Create plot
     p = figure(
-        title="Accounts Receivables Ratio by Month",
+        title="Accounts Receivables Turnover by Month",
         x_range=month,
         tools=tools,
         x_axis_label='month/year',
         y_axis_label='net accounts receivables',
         tooltips=[
             ("Month", "@month"),
-            ("Variance", "@variance{$0,0.00}"),
-            ("Cumulative Variance", "@cumvar{$0,0.00}"),
-            ("AR Ratio", "@varratio{0.000}"),
-            ("Cum. AR Ratio", "@cumvarratio{0.000}"),
+            ("Monthly Sales", "@inflow{$0,0.00}"),
+            ("Cumulative AR", "@cumvar{$0,0.00}"),
+            ("AR Turnover", "@turnover{0.000}"),
         ],
         height=320,
     )
-    p.line(x='month', y='varratio', source=source, legend="discrete", line_width=2, line_color="indigo")
-    p.circle(x='month', y='varratio', source=source, legend="discrete", fill_color=None, line_color="indigo")
-    p.line(x='month', y='cumvarratio', source=source, legend="cumulative", line_width=2, line_color="tomato")
-    p.circle(x='month', y='cumvarratio', source=source, legend="cumulative", fill_color=None, line_color="tomato")
+    p.line(x='month', y='turnover', source=source, line_width=2, line_color="tomato")
+    p.circle(x='month', y='turnover', source=source, fill_color=None, line_color="tomato")
     p.xgrid.grid_line_color = None
     p.sizing_mode = 'scale_width'
-    p.legend.location = "top_left"
     p.xaxis.major_label_orientation = math.pi/3
 
     return p
@@ -352,12 +346,16 @@ def accounts_receivables_balance_by_month():
 
     # Creating lists from Queryset
     month = [i['month'].strftime("%b '%y") for i in query]
+    inflow = [i['inflow'] for i in query]
+    outflow = [i['outflow'] for i in query]
     variance = [i['variance'] for i in query]
     cumvar = [i for i in itertools.accumulate(variance)]
 
     # Create ColumnDataSource
     data = dict(
         month=month,
+        inflow=inflow,
+        outflow=outflow,
         variance=variance,
         cumvar=cumvar,
     )
@@ -372,18 +370,17 @@ def accounts_receivables_balance_by_month():
         y_axis_label='net accounts receivables',
         tooltips=[
             ("Month", "@month"),
-            ("Variance", "@variance{$0,0.00}"),
-            ("Cumulative Variance", "@cumvar{$0,0.00}"),
+            ("Sales", "@inflow{$0,0.00}"),
+            ("Collections", "@outflow{$0,0.00}"),
+            ("Net AR", "@variance{$0,0.00}"),
+            ("Cumulative AR Balance", "@cumvar{$0,0.00}"),
         ],
         height=320,
     )
-    p.line(x='month', y='variance', source=source, legend="discrete", line_width=2, line_color="indigo")
-    p.circle(x='month', y='variance', source=source, legend="discrete", fill_color=None, line_color="indigo")
-    p.line(x='month', y='cumvar', source=source, legend="cumulative", line_width=2, line_color="tomato")
-    p.circle(x='month', y='cumvar', source=source, legend="cumulative", fill_color=None, line_color="tomato")
+    p.line(x='month', y='cumvar', source=source, line_width=2, line_color="tomato")
+    p.circle(x='month', y='cumvar', source=source, fill_color=None, line_color="tomato")
     p.xgrid.grid_line_color = None
     p.sizing_mode = 'scale_width'
-    p.legend.location = "top_left"
     p.yaxis.formatter = NumeralTickFormatter(format='$0a')
     p.xaxis.major_label_orientation = math.pi/3
 
