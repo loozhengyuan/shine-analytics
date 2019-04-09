@@ -1,5 +1,6 @@
 import os
 import csv
+import string
 from django.core.management.base import BaseCommand, CommandError
 
 class Command(BaseCommand):
@@ -25,19 +26,34 @@ class Command(BaseCommand):
             data = csv.reader(f)
             for entry in data:
                 original.append(entry)
-
-        # Removes trailing whitespaces in all data
-        original = [[data.strip() for data in entry] for entry in original]
-
+        
         # Appends header to the two outputs lists
         omitted.append(original[0])
         sanitised.append(original[0])
 
+        # Remove header row
+        original.pop(0)
+
         # Add reasons column specially for omitted list
         omitted[0].append('FailedConditions')
-        
+
+        # Correction 1: Removes trailing whitespaces in all data
+        original = [[data.strip() for data in entry] for entry in original]
+
+        # Correction 2: Removes non-alphanumeric characters in DocRef & AcCode
+        original = [[data.translate(str.maketrans('', '', string.punctuation + string.whitespace)) if index in [
+            1, 2] else data for index, data in enumerate(entry)] for entry in original]
+
+        # Correction 3: Apply abs() to AcCurWTaxAmt or HomeWTaxAmt
+        original = [[abs(float(data)) if index in [
+            7, 8] else data for index, data in enumerate(entry)] for entry in original]
+
+        # Correction 4: Apply correct polarity to AcCurWTaxAmt or HomeWTaxAmt
+        original = [[data * -1 if index in [7, 8] and entry[1][0].upper() ==
+                     'B' else data for index, data in enumerate(entry)] for entry in original]
+
         # Loops through every line in dataset; omits header row
-        for entry in original[1:]:
+        for entry in original:
             # Initial Check: Exits function immediately if length of data entry incorrect
             if len(entry) != 14:
                 raise CommandError("Size of data entry is invalid!")
@@ -70,20 +86,9 @@ class Command(BaseCommand):
                 discard = True
                 reasons.append("Either AcCurWTaxAmt or HomeWTaxAmt is 0")
 
-            # Apply corrections and export if not omitted
+            # Appends entry to sanitised list
             if not discard:
-                # Correction 1: Apply abs() to all amounts
-                entry[7] = abs(float(entry[7]))
-                entry[8] = abs(float(entry[8]))
-
-                # Correction 2: Apply -1 to B-prefix documents
-                if entry[1][0].upper() == 'B':
-                    entry[7] *= -1
-                    entry[8] *= -1
-
-                # Appends entry to sanitised list
                 sanitised.append(entry)
-
             # Appends to omitted list if fails check
             else:
                 # Appends reasons
