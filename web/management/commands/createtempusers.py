@@ -50,27 +50,26 @@ class Command(BaseCommand):
             },
         ]
 
-        # Create Group objects
-        for group in groups:
+        for user, group in zip(users, groups):
+            # Group Object
             try:
-                Group.objects.create(**group)
-            except IntegrityError:
-                # Handle output for violating UNIQUE constraint
-                self.stdout.write(self.style.NOTICE("Group already exists: {}".format(group)))
-            except:
-                # Handle output for unknown errors
-                self.stdout.write(self.style.NOTICE("An unknown error has occured: {}".format(group)))
-
-        # Create User objects
-        for user in users:
+                g = Group.objects.get(name=group['name'])
+            except Group.DoesNotExist:
+                self.stdout.write(self.style.NOTICE("{} does not exist. Creating Group object.".format(group)))
+                g = Group.objects.create(**group)
+            
+            # User Object
             try:
+                u = User.objects.get(username=user['username'])
+            except User.DoesNotExist:
+                self.stdout.write(self.style.NOTICE("{} does not exist. Creating User object.".format(user)))
                 u = User.objects.create(**user)
-            except IntegrityError:
-                # Handle output for violating UNIQUE constraint
-                self.stdout.write(self.style.NOTICE("User already exists: {}".format(user)))
+
+            # Add Group to User
+            try:
+                u.groups.add(g)
             except:
-                # Handle output for unknown errors
-                self.stdout.write(self.style.NOTICE("An unknown error has occured: {}".format(user)))
+                self.stdout.write(self.style.NOTICE("Could not associate user with group: {} {}".format(user, group)))
 
         # Output result
-        self.stdout.write(self.style.SUCCESS("Temporary users and groups were successfully created. Remember to configure their respective group memberships via the admin site."))
+        self.stdout.write(self.style.SUCCESS("Temporary users and groups were successfully created."))
