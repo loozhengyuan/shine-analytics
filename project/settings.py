@@ -120,6 +120,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = "/var/www/shineanalytics.online/static/"
+
 # Authentication
 # https://docs.djangoproject.com/en/2.1/topics/auth/default/#module-django.contrib.auth.views
 
