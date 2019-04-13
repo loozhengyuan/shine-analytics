@@ -38,7 +38,9 @@
 <script src="https://cdn.pydata.org/bokeh/release/bokeh-1.0.4.min.js"></script>
 <script src="https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.4.min.js"></script>
 <script src="https://cdn.pydata.org/bokeh/release/bokeh-tables-1.0.4.min.js"></script>
-{{ bokehjs|safe }}
+{% if bokehjs %}
+    {{ bokehjs|safe }}
+{% endif %}
 {% endblock js %}
 
 {% block header %}
@@ -79,31 +81,37 @@
 {% block content %}
 <section class="section has-background-light">
     <div class="container">
-        <h1 class="title">
-            Analytics Dashboard
-        </h1>
-        <p class="subtitle">
-            {% if user.first_name and user.last_name %}
-            Welcome back <strong>{{ user.first_name }} {{ user.last_name }}</strong>!
-            {% else %}
-            Welcome back <strong>{{ user }}</strong>!
-            {% endif %}
-        </p>
-        {% for row in bokehdiv %}
-        <div class="columns">
-            {% for _, plot in row.items %}
-            <div class="column">
-                <div class="card">
-                    <div class="card-content">
-                        <div class="content">
-                            {{ plot|safe }}
+        {% if bokehdiv %}
+            <h1 class="title">
+                Analytics Dashboard
+            </h1>
+            <p class="subtitle">
+                {% if user.first_name and user.last_name %}
+                Welcome back <strong>{{ user.first_name }} {{ user.last_name }}</strong>!
+                {% else %}
+                Welcome back <strong>{{ user }}</strong>!
+                {% endif %}
+            </p>
+            {% for row in bokehdiv %}
+            <div class="columns">
+                {% for _, plot in row.items %}
+                <div class="column">
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="content">
+                                {{ plot|safe }}
+                            </div>
                         </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
             {% endfor %}
-        </div>
-        {% endfor %}
+        {% else %}
+            <h1 class="title">
+                Sorry! You do not have access to this page.
+            </h1>
+        {% endif %}
     </div>
 </section>
 {% endblock content %}
