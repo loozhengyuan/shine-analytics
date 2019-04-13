@@ -128,3 +128,10 @@ STATIC_ROOT = "/var/www/shineanalytics.online/static/"
 LOGIN_REDIRECT_URL = "/"
 
 LOGOUT_REDIRECT_URL = "/login"
+
+# Security
+# https://docs.djangoproject.com/en/2.1/topics/security/
+
+SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SECURE = True
