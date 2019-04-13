@@ -22,7 +22,7 @@ class Command(BaseCommand):
         sanitised = []
 
         # Open file and append each entry in CSV file to the report list
-        with open(filepath, "r") as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             data = csv.reader(f)
             for entry in data:
                 original.append(entry)
@@ -98,13 +98,13 @@ class Command(BaseCommand):
 
         # Outputs sanitised list to sanitised.csv
         sanitised_filename = "sanitised.csv"
-        with open(sanitised_filename, "w+") as f:
+        with open(sanitised_filename, "w+", encoding="utf-8") as f:
             pointer = csv.writer(f)
             pointer.writerows(sanitised)
 
         # Outputs omitted list to omitted.csv
         omitted_filename = "omitted.csv"
-        with open(omitted_filename, "w+") as f:
+        with open(omitted_filename, "w+", encoding="utf-8") as f:
             pointer = csv.writer(f)
             pointer.writerows(omitted)
 

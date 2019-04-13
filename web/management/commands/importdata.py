@@ -22,7 +22,7 @@ class Command(BaseCommand):
         original = []
 
         # Open file and append each entry in CSV file to the report list
-        with open(filepath, "r") as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             data = csv.reader(f)
             for entry in data:
                 original.append(entry)
